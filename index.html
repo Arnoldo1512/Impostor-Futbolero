@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Impostor Fútbol</title>
 
 <style>
@@ -16,6 +16,7 @@ body {
   align-items:center;
   height:100vh;
   overflow:hidden;
+   touch-action: manipulation;
 }
 
 /* Fondo estadio animado */
@@ -78,16 +79,21 @@ body::before {
   padding:15px;
   border:1px solid rgba(255,255,255,0.1);
   box-shadow: 0 0 20px rgba(34,197,94,0.2);
+    overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* BLOQUES */
 .bloque {
-  margin-bottom:18px;
+  background: rgba(255,255,255,0.03);
+  padding: 10px;
+  border-radius: 12px;
+ margin-bottom: 22px;
 }
 
 .bloque h3 {
   font-size:13px;
-  margin-bottom:8px;
+   margin-bottom: 10px;
   color:#facc15;
   text-transform:uppercase;
   letter-spacing:1px;
@@ -190,13 +196,16 @@ input {
   display: none;
 }
 
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .active {
   display: block;
 }
 
-.screen.active {
-  animation: aparecer 0.3s ease;
-}
 
 @keyframes aparecer {
   from { opacity: 0; transform: translateY(20px); }
@@ -209,35 +218,51 @@ input {
 
 <body>
 
-<div id="inicio" class="screen active">
+<!-- ===================== -->
+<!-- 1️⃣ CATEGORÍA -->
+<!-- ===================== -->
+<div id="categoriaScreen" class="screen active">
 
   <div class="header">
     <h1>⚽ Impostor Fútbol</h1>
-    <p>Configura la partida</p>
+    <p>Elige una categoría</p>
+  </div>
+
+  <div class="card">
+    <div class="gridCategorias">
+      <button onclick="seleccionarCategoria('jugadores'); irTiempos()">Jugadores</button>
+      <button onclick="seleccionarCategoria('clubes'); irTiempos()">Clubes</button>
+      <button onclick="seleccionarCategoria('selecciones'); irTiempos()">Selecciones</button>
+      <button onclick="seleccionarCategoria('mixto'); irTiempos()">Mixto</button>
+      <button onclick="seleccionarCategoria('dts'); irTiempos()">DTs</button>
+      <button onclick="seleccionarCategoria('estadios'); irTiempos()">Estadios</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== -->
+<!-- 2️⃣ TIEMPOS -->
+<!-- ===================== -->
+<div id="tiempoScreen" class="screen">
+
+  <div class="header">
+    <h1>⏱ Configura el tiempo</h1>
   </div>
 
   <div class="card">
 
-    <!-- JUGADORES -->
     <div class="bloque">
-      <h3>👥 Jugadores</h3>
-      <div class="selector">
-        <button onclick="cambiarNum(-1)">−</button>
-        <div class="num" id="numJugadores">4</div>
-        <button onclick="cambiarNum(1)">+</button>
-      </div>
-    </div>
-
-    <!-- TIEMPOS -->
-    <div class="bloque">
-      <h3>⏱ Tiempo de ronda</h3>
+      <h3>Tiempo de ronda</h3>
       <div class="selector">
         <button onclick="cambiarTiempo('ronda', -10)">−</button>
         <div class="num" id="tiempoRondaTxt">60</div>
         <button onclick="cambiarTiempo('ronda', 10)">+</button>
       </div>
+    </div>
 
-      <h3 style="margin-top:10px;">🗳 Tiempo de votación</h3>
+    <div class="bloque">
+      <h3>Tiempo de votación</h3>
       <div class="selector">
         <button onclick="cambiarTiempo('votacion', -5)">−</button>
         <div class="num" id="tiempoVotacionTxt">10</div>
@@ -245,23 +270,29 @@ input {
       </div>
     </div>
 
-    <!-- CATEGORÍAS -->
-    <div class="bloque">
-      <h3>⚽ Categoría</h3>
-      <div class="gridCategorias">
-        <button onclick="seleccionarCategoria('jugadores')" id="btnJugadores">Jugadores</button>
-        <button onclick="seleccionarCategoria('clubes')" id="btnClubes">Clubes</button>
-        <button onclick="seleccionarCategoria('selecciones')" id="btnSelecciones">Selecciones</button>
-        <button onclick="seleccionarCategoria('mixto')" id="btnMixto">Mixto</button>
-        <button onclick="seleccionarCategoria('dts')" id="btnDts">DTs</button>
-        <button onclick="seleccionarCategoria('estadios')" id="btnEstadios">Estadios</button>
-      </div>
-    </div>
-
   </div>
 
-  <button class="btn" onclick="irNombres()">Jugar</button>
+  <button class="btn" onclick="irJugadores()">Siguiente</button>
+</div>
 
+<!-- ===================== -->
+<!-- 3️⃣ JUGADORES -->
+<!-- ===================== -->
+<div id="jugadoresScreen" class="screen">
+
+  <div class="header">
+    <h1>👥 Jugadores</h1>
+  </div>
+
+  <div class="card">
+    <div class="selector">
+      <button onclick="cambiarNum(-1)">−</button>
+      <div class="num" id="numJugadores">4</div>
+      <button onclick="cambiarNum(1)">+</button>
+    </div>
+  </div>
+
+  <button class="btn" onclick="irNombres()">Continuar</button>
 </div>
 
 
@@ -322,6 +353,16 @@ input {
 <audio id="sTick" src="sounds/tick.mp3"></audio>
 
 <script>
+
+  function irTiempos(){
+  playSound("sClick");
+  cambiarPantalla("tiempoScreen");
+}
+
+function irJugadores(){
+  playSound("sClick");
+  cambiarPantalla("jugadoresScreen");
+}
 
   function detenerTimers(){
   clearInterval(intervaloRonda);
@@ -439,17 +480,6 @@ function cambiarNum(v){
 /* categoría */
 function seleccionarCategoria(cat){
   categoriaSeleccionada = cat;
-
-  document.querySelectorAll(".gridCategorias button").forEach(b=>{
-    b.classList.remove("activeCat");
-  });
-
-  if (cat === "jugadores") btnJugadores.classList.add("activeCat");
-  if (cat === "clubes") btnClubes.classList.add("activeCat");
-  if (cat === "selecciones") btnSelecciones.classList.add("activeCat");
-  if (cat === "mixto") btnMixto.classList.add("activeCat");
-  if (cat === "dts") btnDts.classList.add("activeCat");
-  if (cat === "estadios") btnEstadios.classList.add("activeCat");
 }
 
 /* nombres */
@@ -688,10 +718,9 @@ function cambiarPantalla(id){
 
 function volverInicio(){
  detenerTimers();
-  cambiarPantalla("inicio");
+    cambiarPantalla("categoriaScreen"); 
 }
 
-document.querySelector(".card").style.animation="shake 0.3s";
 setTimeout(()=>{
   document.querySelector(".card").style.animation="";
 },300);
